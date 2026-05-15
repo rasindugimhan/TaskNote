@@ -222,3 +222,33 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+/* Widget Dropdown Credits */
+.menu-credits {
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 0.733rem;
+  color: var(--text-color);
+}
+
+.menu-credits p {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.menu-credit-links {
+  display: flex;
+  gap: 12px;
+}
+
+.menu-credit-links a {
+  color: #fce205; /* Use brand yellow for links */
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.menu-credit-links a:hover {
+  text-decoration: underline;
+}
+

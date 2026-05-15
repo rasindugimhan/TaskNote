@@ -151,3 +151,93 @@ select {
 .settings-card { background: var(--panel-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 600px; }
 .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
 .setting-row:last-child { border-bottom: none; }
+
+/* Sidebar Footer & Credits */
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.credits {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+}
+
+.dev-name {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.credit-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.credit-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 11px;
+  transition: 0.2s;
+}
+
+.credit-link:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+/* Developer Card in Settings */
+.developer-card {
+  margin-top: 25px;
+}
+
+.developer-card h3 {
+  margin-bottom: 10px;
+  color: var(--primary-color);
+}
+
+.developer-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+}
+
+.dev-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dev-link-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--body-bg);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dev-link-item:hover {
+  border-color: var(--primary-color);
+  background: var(--hover-bg);
+}
+
+.link-label {
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+.link-value {
+  font-size: 13px;
+  color: var(--primary-color);
+}
+

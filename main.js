@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu, Notification, nativeTheme, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, Notification, nativeTheme, nativeImage, shell } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -140,6 +140,10 @@ ipcMain.on('toggle-pin', (event, pin) => {
 });
 
 // Window controls for the frameless widget
+ipcMain.on('open-external', (event, url) => {
+  shell.openExternal(url);
+});
+
 ipcMain.on('window-control', (event, command) => {
   if (!widgetWindow) return;
   if (command === 'minimize') widgetWindow.minimize();

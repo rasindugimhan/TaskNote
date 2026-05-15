@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('api', {
   toggleAutoLaunch: (enable) => ipcRenderer.invoke('toggle-auto-launch', enable),
   openDashboard: () => ipcRenderer.send('open-dashboard'),
   openWidget: () => ipcRenderer.send('open-widget'),
+  openExternal: (url) => ipcRenderer.send('open-external', url),
   onDataUpdated: (callback) => ipcRenderer.on('data-updated', callback)
 });

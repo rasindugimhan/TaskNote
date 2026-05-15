@@ -394,3 +394,14 @@ function openNoteEditor(id) {
   
   noteEditorBody.focus();
 }
+
+// External Links
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-url]');
+  if (target) {
+    e.preventDefault();
+    const url = target.getAttribute('data-url');
+    if (url) window.api.openExternal(url);
+  }
+});
+

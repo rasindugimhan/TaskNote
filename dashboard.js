@@ -407,3 +407,14 @@ const saveNoteData = () => {
 };
 noteEditorTitle.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
 noteEditorBody.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
+
+// External Links
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-url]');
+  if (target) {
+    e.preventDefault();
+    const url = target.getAttribute('data-url');
+    if (url) window.api.openExternal(url);
+  }
+});
+
