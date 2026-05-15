@@ -19,6 +19,7 @@ async function init() {
   currentEditingTaskId = await window.api.getEditingTaskId();
   
   renderCategories();
+  applyTheme();
   
   if (currentEditingTaskId) {
     const task = appData.tasks.find(t => t.id === currentEditingTaskId);
@@ -51,7 +52,24 @@ window.api.onDataUpdated(async () => {
   const data = await window.api.getData();
   appData.categories = data.categories || [];
   renderCategories();
+  applyTheme();
 });
+
+function applyTheme() {
+  const theme = appData.settings?.theme || 'system';
+  document.body.classList.remove('theme-light', 'theme-dark');
+  
+  if (theme === 'light') {
+    document.body.classList.add('theme-light');
+  } else if (theme === 'dark') {
+    document.body.classList.add('theme-dark');
+  } else {
+    // system
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.body.classList.add('theme-light');
+    }
+  }
+}
 
 window.api.onSetTaskId((id) => {
   currentEditingTaskId = id;

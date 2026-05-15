@@ -11,12 +11,12 @@
 /* Light Theme */
 body.theme-light {
   --bg-color: #fce205; /* Keep yellow top for brand */
-  --body-bg: #fafafa;
-  --text-color: #333333;
-  --border-color: #dddddd;
+  --body-bg: #f8f9fa;
+  --text-color: #212529;
+  --border-color: #e9ecef;
   --menu-bg: #ffffff;
-  --menu-hover: #eeeeee;
-  --item-bg: #f0f0f0;
+  --menu-hover: #f1f3f5;
+  --item-bg: #ffffff;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -68,7 +68,8 @@ body {
   background-color: var(--menu-bg);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  transition: opacity 0.2s, transform 0.2s;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -170,13 +171,18 @@ body {
   gap: 10px;
 }
 .note-item {
-  background: var(--item-bg);
-  padding: 10px;
-  border-radius: 6px;
+  background-color: var(--item-bg);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 10px;
   cursor: pointer;
-  border: 1px solid transparent;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.note-item:hover { border-color: var(--border-color); }
+.note-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
 .note-item h4 { font-size: 0.933rem; margin-bottom: 5px; }
 .note-item p { font-size: 0.8rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 

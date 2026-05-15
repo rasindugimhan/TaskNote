@@ -27,6 +27,29 @@ saveBtn.addEventListener('click', async () => {
   window.api.closeCategoryWindow();
 });
 
+function applyTheme(appData) {
+  const theme = appData.settings?.theme || 'system';
+  document.body.classList.remove('theme-light', 'theme-dark');
+  
+  if (theme === 'light') {
+    document.body.classList.add('theme-light');
+  } else if (theme === 'dark') {
+    document.body.classList.add('theme-dark');
+  } else {
+    // system
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.body.classList.add('theme-light');
+    }
+  }
+}
+
+async function init() {
+  const appData = await window.api.getData();
+  applyTheme(appData);
+}
+
+init();
+
 catNameInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') saveBtn.click();
 });
