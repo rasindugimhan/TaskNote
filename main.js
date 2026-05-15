@@ -4,7 +4,10 @@ const fs = require('node:fs');
 
 let widgetWindow = null;
 let dashboardWindow = null;
+let categoryWindow = null;
+let taskWindow = null;
 let tray = null;
+let editingTaskId = null;
 const dataFile = path.join(app.getPath('userData'), 'task_note_data.json');
 
 // Initialize data
@@ -87,6 +90,68 @@ function createWidgetWindow() {
   });
 }
 
+function createCategoryWindow() {
+  if (categoryWindow) {
+    categoryWindow.show();
+    categoryWindow.focus();
+    return;
+  }
+
+  categoryWindow = new BrowserWindow({
+    width: 350,
+    height: 220,
+    icon: path.join(__dirname, 'notepad.png'),
+    frame: false,
+    resizable: false,
+    alwaysOnTop: true,
+    show: true,
+    center: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  categoryWindow.setMenuBarVisibility(false);
+  categoryWindow.loadFile('category.html');
+  categoryWindow.on('closed', () => { categoryWindow = null; });
+}
+
+function createTaskWindow(taskId = null) {
+  editingTaskId = taskId;
+  if (taskWindow) {
+    taskWindow.show();
+    taskWindow.focus();
+    // If it was already open, we might need to tell it to refresh for a different taskId
+    taskWindow.webContents.send('set-task-id', taskId);
+    return;
+  }
+
+  taskWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    icon: path.join(__dirname, 'notepad.png'),
+    frame: false,
+    resizable: false,
+    alwaysOnTop: true,
+    show: true,
+    center: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  taskWindow.setMenuBarVisibility(false);
+  taskWindow.loadFile('task_form.html');
+  taskWindow.on('closed', () => { 
+    taskWindow = null; 
+    editingTaskId = null;
+  });
+}
+
 function createTray() {
   const iconPath = path.join(__dirname, 'notepad.png');
   const icon = nativeImage.createFromPath(iconPath);
@@ -133,6 +198,15 @@ ipcMain.on('save-data', (event, data) => {
 
 ipcMain.on('open-dashboard', () => createDashboardWindow());
 ipcMain.on('open-widget', () => createWidgetWindow());
+ipcMain.on('open-category-window', () => createCategoryWindow());
+ipcMain.on('close-category-window', () => {
+  if (categoryWindow) categoryWindow.close();
+});
+ipcMain.on('open-task-window', (event, taskId) => createTaskWindow(taskId));
+ipcMain.on('close-task-window', () => {
+  if (taskWindow) taskWindow.close();
+});
+ipcMain.handle('get-editing-task-id', () => editingTaskId);
 
 // Make sure the widget is the one being pinned
 ipcMain.on('toggle-pin', (event, pin) => {

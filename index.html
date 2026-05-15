@@ -44,8 +44,8 @@
           <select id="group-tasks" style="font-size: 11px;">
             <option value="none">Group: None</option>
             <option value="date">Group: Date</option>
-            <option value="title">Group: Title</option>
             <option value="status">Group: Status</option>
+            <option value="category">Group: Category</option>
           </select>
           <select id="sort-tasks" style="font-size: 11px;">
             <option value="expire">Sort: Expire</option>
@@ -88,18 +88,26 @@
     <div class="modal-content">
       <input type="text" id="task-title" placeholder="Task Name..." autofocus>
       
-      <label>Remind before expiry (Optional)</label>
+      <div class="divider"></div>
+      <label>Set Reminder (Relative)</label>
       <div class="row">
-        <input type="number" id="rem-before-days" min="0" placeholder="D" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">d</span>
-        <input type="number" id="rem-before-hours" min="0" placeholder="H" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">h</span>
-        <input type="number" id="rem-before-mins" min="0" placeholder="M" style="flex: 1;"> <span style="font-size: 12px;">m</span>
+        <input type="number" id="rem-days" min="0" placeholder="D" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">d</span>
+        <input type="number" id="rem-hours" min="0" placeholder="H" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">h</span>
+        <input type="number" id="rem-mins" min="0" placeholder="M" style="flex: 1;"> <span style="font-size: 12px;">m</span>
       </div>
 
       <div class="divider"></div>
-      <label>Precise Custom Reminder (Optional)</label>
+      <label>Precise Custom Reminder</label>
       <div class="row">
         <input type="date" id="custom-date" style="flex: 2;">
-        <input type="time" id="custom-time" step="1" style="flex: 1;" title="Time including seconds">
+        <input type="time" id="custom-time" step="1" style="flex: 1;">
+      </div>
+
+      <div class="divider"></div>
+      <label>Assign to Group</label>
+      <div style="display: flex; gap: 5px; align-items: center;">
+        <select id="task-category" style="flex-grow: 1; background: var(--body-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; font-size: 13px;"></select>
+        <button id="quick-add-cat-btn" class="btn" style="padding: 8px 12px; font-weight: bold;">+</button>
       </div>
 
       <div class="row right" style="margin-top:10px;">

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Details</title>
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --panel: #2d2d2d;
+      --text: #ffffff;
+      --primary: #ffcc00;
+      --border: #444;
+      --input-bg: #333;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      border: 1px solid var(--border);
+    }
+    .title-bar {
+      height: 35px;
+      background: var(--primary);
+      color: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 15px;
+      font-weight: bold;
+      font-size: 13px;
+      -webkit-app-region: drag;
+    }
+    .close-btn {
+      -webkit-app-region: no-drag;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .content {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    label { font-size: 13px; color: #aaa; }
+    input, select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      padding: 8px;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--primary); }
+    #task-title { width: 100%; font-size: 16px; padding: 12px; box-sizing: border-box; }
+    .footer {
+      padding: 15px 20px;
+      background: var(--panel);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--border);
+    }
+    button {
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .btn-primary { background: var(--primary); color: #000; }
+    .btn-secondary { background: #444; color: #fff; }
+    .unit { font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="title-bar">
+    <span id="window-title">TASK DETAILS</span>
+    <span class="close-btn" id="close-btn">&times;</span>
+  </div>
+  <div class="content">
+    <input type="text" id="task-title" placeholder="What needs to be done?" autofocus>
+    
+    <div style="margin-top: 10px;">
+      <label>Set Reminder:</label>
+      <div class="form-row" style="margin-top: 5px;">
+        <input type="number" id="rem-days" min="0" placeholder="D" style="width: 50px;"> <span class="unit">d</span>
+        <input type="number" id="rem-hours" min="0" placeholder="H" style="width: 50px;"> <span class="unit">h</span>
+        <input type="number" id="rem-mins" min="0" placeholder="M" style="width: 50px;"> <span class="unit">m</span>
+        <span style="margin: 0 10px; color: #666;">OR</span>
+        <input type="date" id="custom-date">
+        <input type="time" id="custom-time" step="1">
+      </div>
+    </div>
+
+    <!-- Remind before expiry removed -->
+
+    <div>
+      <label>Assign to Group:</label>
+      <div class="form-row" style="margin-top: 5px;">
+        <select id="task-category" style="flex-grow: 1;"></select>
+        <button id="quick-add-cat-btn" class="btn-secondary" style="padding: 5px 10px;">+ New Group</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <button class="btn-secondary" id="cancel-btn">Cancel</button>
+    <button class="btn-primary" id="save-task-btn">Add Task</button>
+  </div>
+
+  <script src="task_form.js"></script>
+</body>
+</html>

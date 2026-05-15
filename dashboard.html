@@ -37,8 +37,8 @@
           <select id="group-tasks" style="margin-right: 10px;">
             <option value="none">No Grouping</option>
             <option value="date">Group by Date</option>
-            <option value="title">Group by Title</option>
             <option value="status">Group by Status</option>
+            <option value="category">Group by Category</option>
           </select>
           <select id="sort-tasks">
             <option value="expire">Sort by Expiring Date</option>
@@ -49,26 +49,7 @@
         </div>
       </div>
       
-      <div class="add-task-form" id="add-task-form" style="display: none;">
-        <input type="text" id="task-title" placeholder="What needs to be done?">
-        <div class="form-row" style="flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-size: 13px;">Remind in:</span>
-          <input type="number" id="rem-days" min="0" placeholder="D" style="width: 50px;"> <span style="font-size: 12px;">d</span>
-          <input type="number" id="rem-hours" min="0" placeholder="H" style="width: 50px;"> <span style="font-size: 12px;">h</span>
-          <input type="number" id="rem-mins" min="0" placeholder="M" style="width: 50px;"> <span style="font-size: 12px;">m</span>
-          
-          <span style="margin-left:10px; font-size: 13px;">OR Precise:</span>
-          <input type="date" id="custom-date">
-          <input type="time" id="custom-time" step="1">
-        </div>
-        <div class="form-row" style="flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px;">
-          <span style="font-size: 13px; font-weight: bold;">Remind before expiry (Optional):</span>
-          <input type="number" id="rem-before-days" min="0" placeholder="D" style="width: 50px;"> <span style="font-size: 12px;">d</span>
-          <input type="number" id="rem-before-hours" min="0" placeholder="H" style="width: 50px;"> <span style="font-size: 12px;">h</span>
-          <input type="number" id="rem-before-mins" min="0" placeholder="M" style="width: 50px;"> <span style="font-size: 12px;">m</span>
-          <button id="save-task" class="btn-primary" style="margin-left: auto;">Add Task</button>
-        </div>
-      </div>
+      <!-- Task list -->
 
       <ul id="task-list" class="task-list"></ul>
     </div>
@@ -118,6 +99,17 @@
         <div class="setting-row">
           <span>Auto Start on PC Boot</span>
           <input type="checkbox" id="setting-autolaunch">
+        </div>
+      </div>
+      
+      <div class="settings-card" style="margin-top: 20px;">
+        <h3>Manage Task Groups</h3>
+        <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+          <div style="display: flex; gap: 10px; width: 100%;">
+            <input type="text" id="new-category-name" placeholder="New Group Name..." style="flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--body-bg); color: var(--text-color);">
+            <button id="add-category-btn" class="btn-primary">Add Group</button>
+          </div>
+          <ul id="category-list" style="width: 100%; list-style: none; margin-top: 10px; max-height: 200px; overflow-y: auto;"></ul>
         </div>
       </div>
 

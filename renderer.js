@@ -2,6 +2,7 @@
 let appData = {
   tasks: [],
   notes: [], // array of {id, title, body}
+  categories: [],
   settings: { theme: 'system', pinToTop: false, autoLaunch: false }
 };
 
@@ -35,6 +36,8 @@ const saveTaskBtn = document.getElementById('save-task');
 const cancelTaskBtn = document.getElementById('cancel-task');
 
 const sortNotesSelect = document.getElementById('sort-notes');
+const taskCategorySelect = document.getElementById('task-category');
+const quickAddCatBtn = document.getElementById('quick-add-cat-btn');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -71,10 +74,12 @@ async function loadDataAndApplySettings() {
       appData.notes = data.notes || [];
     }
     
+    appData.categories = data.categories || [];
     appData.settings = Object.assign({ theme: 'system', pinToTop: false, autoLaunch: false }, data.settings);
   }
 
   applySettings();
+  renderCategories();
   renderTasks();
   renderNotes();
 }
@@ -162,6 +167,7 @@ function setupEvents() {
       document.getElementById('save-task').innerText = 'Add Task';
       taskModal.classList.remove('hidden');
       document.getElementById('task-title').focus();
+      renderCategories();
     }
   });
 
@@ -172,19 +178,25 @@ function setupEvents() {
     const title = document.getElementById('task-title').value;
     if (!title.trim()) return;
 
-    const beforeDays = parseInt(document.getElementById('rem-before-days').value) || 0;
-    const beforeHours = parseInt(document.getElementById('rem-before-hours').value) || 0;
-    const beforeMins = parseInt(document.getElementById('rem-before-mins').value) || 0;
-    let reminderBefore = null;
-    if (beforeDays > 0 || beforeHours > 0 || beforeMins > 0) {
-       reminderBefore = (beforeDays * 1440) + (beforeHours * 60) + beforeMins;
-    }
+    const days = parseInt(document.getElementById('rem-days').value) || 0;
+    const hours = parseInt(document.getElementById('rem-hours').value) || 0;
+    const mins = parseInt(document.getElementById('rem-mins').value) || 0;
 
     const customDate = document.getElementById('custom-date').value;
     const customTime = document.getElementById('custom-time').value;
     let customReminder = null;
     if (customDate && customTime) {
-      customReminder = `${customDate}T${customTime}`; // Format: YYYY-MM-DDTHH:mm:ss
+      customReminder = `${customDate}T${customTime}`;
+    } else if (days > 0 || hours > 0 || mins > 0) {
+      const totalMs = (days * 86400000) + (hours * 3600000) + (mins * 60000);
+      const targetDate = new Date(Date.now() + totalMs);
+      const yyyy = targetDate.getFullYear();
+      const MM = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(targetDate.getDate()).padStart(2, '0');
+      const hh = String(targetDate.getHours()).padStart(2, '0');
+      const mm = String(targetDate.getMinutes()).padStart(2, '0');
+      const ss = String(targetDate.getSeconds()).padStart(2, '0');
+      customReminder = `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
     }
 
     if (currentEditingTaskId) {
@@ -193,7 +205,7 @@ function setupEvents() {
         t.title = title;
         t.reminders = [];
         t.customReminder = customReminder;
-        t.reminderBefore = reminderBefore;
+        t.categoryId = taskCategorySelect.value;
       }
     } else {
       appData.tasks.push({
@@ -201,22 +213,26 @@ function setupEvents() {
         title,
         reminders: [],
         customReminder,
-        reminderBefore,
         done: false,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        categoryId: taskCategorySelect.value
       });
     }
 
     saveData();
     renderTasks();
+    currentEditingTaskId = null;
+    saveTaskBtn.innerText = 'Add Task';
     taskModal.classList.add('hidden');
     
     // reset form
     document.getElementById('task-title').value = '';
     document.getElementById('custom-date').value = '';
-    document.getElementById('rem-before-days').value = '';
-    document.getElementById('rem-before-hours').value = '';
-    document.getElementById('rem-before-mins').value = '';
+    document.getElementById('custom-time').value = '';
+    document.getElementById('rem-days').value = '';
+    document.getElementById('rem-hours').value = '';
+    document.getElementById('rem-mins').value = '';
+    taskCategorySelect.value = '';
   });
 
   sortTasksSelect.addEventListener('change', renderTasks);
@@ -256,6 +272,13 @@ function setupEvents() {
   };
   noteEditorTitle.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
   noteEditorBody.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
+
+  if (quickAddCatBtn) {
+    quickAddCatBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.api.openCategoryWindow();
+    });
+  }
 }
 
 // Render Tasks
@@ -305,33 +328,50 @@ function renderTasks() {
           else groups['No Date'].push(t);
         }
       });
-    } else if (groupBy === 'title') {
-      sorted.forEach(t => {
-        const firstChar = t.title.charAt(0).toUpperCase();
-        const key = /^[A-Z]$/.test(firstChar) ? firstChar : '#';
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(t);
-      });
     } else if (groupBy === 'status') {
       groups = { 'Pending': [], 'Completed': [] };
       sorted.forEach(t => {
         if (t.done) groups['Completed'].push(t);
         else groups['Pending'].push(t);
       });
+    } else if (groupBy === 'category') {
+      groups = { 'No Group': [] };
+      appData.categories.forEach(c => groups[c.id] = []);
+      sorted.forEach(t => {
+        if (t.categoryId && groups[t.categoryId]) {
+          groups[t.categoryId].push(t);
+        } else {
+          groups['No Group'].push(t);
+        }
+      });
     }
 
-    Object.keys(groups).forEach(groupName => {
-      if (groups[groupName].length > 0) {
+    Object.keys(groups).forEach(groupId => {
+      if (groups[groupId].length > 0) {
         const header = document.createElement('li');
         header.className = 'task-group-header';
-        header.innerText = groupName;
+        
+        let displayName = groupId;
+        if (groupId === 'No Group') displayName = 'No Group';
+        else {
+          const cat = appData.categories.find(c => c.id === groupId);
+          if (cat) displayName = cat.name;
+        }
+        
+        header.innerText = displayName;
         taskList.appendChild(header);
-        groups[groupName].forEach(task => renderTaskItem(task, taskList));
+        groups[groupId].forEach(task => renderTaskItem(task, taskList));
       }
     });
   }
 
   setupTaskItemEvents();
+
+  if (currentEditingTaskId) {
+    saveTaskBtn.innerText = 'Save Task';
+  } else {
+    saveTaskBtn.innerText = 'Add Task';
+  }
 }
 
 function renderTaskItem(task, container) {
@@ -383,18 +423,11 @@ function setupTaskItemEvents() {
       if (t) {
         currentEditingTaskId = id;
         document.getElementById('task-title').value = t.title;
-        if (t.reminderBefore) {
-          const bDays = Math.floor(t.reminderBefore / 1440);
-          const bHours = Math.floor((t.reminderBefore % 1440) / 60);
-          const bMins = t.reminderBefore % 60;
-          document.getElementById('rem-before-days').value = bDays > 0 ? bDays : '';
-          document.getElementById('rem-before-hours').value = bHours > 0 ? bHours : '';
-          document.getElementById('rem-before-mins').value = bMins > 0 ? bMins : '';
-        } else {
-          document.getElementById('rem-before-days').value = '';
-          document.getElementById('rem-before-hours').value = '';
-          document.getElementById('rem-before-mins').value = '';
-        }
+        renderCategories();
+        taskCategorySelect.value = t.categoryId || '';
+        document.getElementById('rem-days').value = '';
+        document.getElementById('rem-hours').value = '';
+        document.getElementById('rem-mins').value = '';
 
         if (t.customReminder) {
           const parts = t.customReminder.split('T');
@@ -408,6 +441,17 @@ function setupTaskItemEvents() {
         taskModal.classList.remove('hidden');
       }
     });
+  });
+}
+
+function renderCategories() {
+  if (!taskCategorySelect) return;
+  taskCategorySelect.innerHTML = '<option value="">None</option>';
+  appData.categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat.id;
+    option.innerText = cat.name;
+    taskCategorySelect.appendChild(option);
   });
 }
 

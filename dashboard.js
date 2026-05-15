@@ -2,6 +2,7 @@
 let appData = {
   tasks: [],
   notes: [], 
+  categories: [],
   settings: { theme: 'system', pinToTop: false, autoLaunch: false }
 };
 
@@ -16,9 +17,7 @@ const views = document.querySelectorAll('.view');
 const taskList = document.getElementById('task-list');
 const sortTasksSelect = document.getElementById('sort-tasks');
 const groupTasksSelect = document.getElementById('group-tasks');
-const saveTaskBtn = document.getElementById('save-task');
 const addTaskBtn = document.getElementById('add-task-btn');
-const addTaskForm = document.getElementById('add-task-form');
 
 const notesGrid = document.getElementById('notes-grid');
 const sortNotesSelect = document.getElementById('sort-notes');
@@ -33,6 +32,10 @@ const noteEditorBody = document.getElementById('note-editor-body');
 
 const themeSelect = document.getElementById('setting-theme');
 const autoLaunchCb = document.getElementById('setting-autolaunch');
+
+const addCategoryBtn = document.getElementById('add-category-btn');
+const newCategoryInput = document.getElementById('new-category-name');
+const categoryList = document.getElementById('category-list');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,10 +62,12 @@ async function loadDataAndApplySettings() {
       appData.notes = data.notes || [];
     }
     
+    appData.categories = data.categories || [];
     appData.settings = Object.assign({ theme: 'system', pinToTop: false, autoLaunch: false }, data.settings);
   }
 
   applySettings();
+  renderCategories();
   renderTasks();
   renderNotes();
   
@@ -126,102 +131,58 @@ autoLaunchCb.addEventListener('change', async (e) => {
   saveData();
 });
 
-// Tasks
-saveTaskBtn.addEventListener('click', () => {
-  const titleInput = document.getElementById('task-title');
-  const title = titleInput.value;
-  if (!title.trim()) return;
+if (addCategoryBtn) {
+  addCategoryBtn.addEventListener('click', () => {
+    const name = newCategoryInput.value.trim();
+    if (!name) return;
+    if (appData.categories.find(c => c.name === name)) return;
 
-  const days = parseInt(document.getElementById('rem-days').value) || 0;
-  const hours = parseInt(document.getElementById('rem-hours').value) || 0;
-  const mins = parseInt(document.getElementById('rem-mins').value) || 0;
+    appData.categories.push({ id: Date.now().toString(), name });
+    newCategoryInput.value = '';
+    saveData();
+    renderCategories();
+  });
+}
 
-  const customDate = document.getElementById('custom-date').value;
-  const customTime = document.getElementById('custom-time').value;
+function renderCategories() {
+  if (!categoryList) return;
   
-  const beforeVal = parseInt(document.getElementById('rem-before-val').value);
-  const beforeUnit = document.getElementById('rem-before-unit').value;
-  let reminderBefore = null; // store in minutes
-  if (!isNaN(beforeVal) && beforeVal > 0) {
-     if (beforeUnit === 'mins') reminderBefore = beforeVal;
-     if (beforeUnit === 'hours') reminderBefore = beforeVal * 60;
-     if (beforeUnit === 'days') reminderBefore = beforeVal * 60 * 24;
-  }
-  
-  let customReminder = null;
-  const reminders = []; 
-  
-  if (customDate && customTime) {
-    customReminder = `${customDate}T${customTime}`; 
-  } else if (days > 0 || hours > 0 || mins > 0) {
-    const totalMs = (days * 86400000) + (hours * 3600000) + (mins * 60000);
-    const targetDate = new Date(Date.now() + totalMs);
-    const yyyy = targetDate.getFullYear();
-    const MM = String(targetDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(targetDate.getDate()).padStart(2, '0');
-    const hh = String(targetDate.getHours()).padStart(2, '0');
-    const mm = String(targetDate.getMinutes()).padStart(2, '0');
-    const ss = String(targetDate.getSeconds()).padStart(2, '0');
-    customReminder = `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
-  }
-
-  if (currentEditingTaskId) {
-    const t = appData.tasks.find(x => x.id === currentEditingTaskId);
-    if (t) {
-      t.title = title;
-      t.reminders = reminders;
-      t.customReminder = customReminder;
-      t.reminderBefore = reminderBefore;
-    }
-    currentEditingTaskId = null;
-    document.getElementById('save-task').innerText = 'Add Task';
-  } else {
-    appData.tasks.push({
-      id: Date.now().toString(),
-      title,
-      reminders,
-      customReminder,
-      reminderBefore,
-      done: false,
-      createdAt: Date.now()
+  categoryList.innerHTML = '';
+  appData.categories.forEach(cat => {
+    const li = document.createElement('li');
+    li.style.display = 'flex';
+    li.style.justifyContent = 'space-between';
+    li.style.alignItems = 'center';
+    li.style.padding = '5px 0';
+    li.style.borderBottom = '1px solid var(--border-color)';
+    li.innerHTML = `
+      <span>${cat.name}</span>
+      <button class="btn-danger btn-sm" data-id="${cat.id}" style="padding: 2px 6px; font-size: 10px;">Remove</button>
+    `;
+    li.querySelector('button').addEventListener('click', () => {
+      appData.categories = appData.categories.filter(c => c.id !== cat.id);
+      saveData();
+      renderCategories();
     });
-  }
+    categoryList.appendChild(li);
 
-  saveData();
-  renderTasks();
-  addTaskForm.style.display = 'none';
-  
-  titleInput.value = '';
-  document.getElementById('rem-days').value = '';
-  document.getElementById('rem-hours').value = '';
-  document.getElementById('rem-mins').value = '';
-  document.getElementById('custom-date').value = '';
-  document.getElementById('custom-time').value = '';
-  document.getElementById('rem-before-val').value = '';
-  document.getElementById('rem-before-unit').value = 'mins';
+    const option = document.createElement('option');
+    option.value = cat.id;
+    option.innerText = cat.name;
+    taskCategorySelect.appendChild(option);
+  });
+}
+
+// Tasks
+// Tasks
+addTaskBtn.addEventListener('click', () => {
+  window.api.openTaskWindow();
 });
 
 sortTasksSelect.addEventListener('change', renderTasks);
 groupTasksSelect.addEventListener('change', renderTasks);
 
-addTaskBtn.addEventListener('click', () => {
-  if (addTaskForm.style.display === 'none') {
-    addTaskForm.style.display = 'block';
-    currentEditingTaskId = null;
-    document.getElementById('save-task').innerText = 'Add Task';
-    document.getElementById('task-title').value = '';
-    document.getElementById('rem-days').value = '';
-    document.getElementById('rem-hours').value = '';
-    document.getElementById('rem-mins').value = '';
-    document.getElementById('custom-date').value = '';
-    document.getElementById('custom-time').value = '';
-    document.getElementById('rem-before-val').value = '';
-    document.getElementById('rem-before-unit').value = 'mins';
-    document.getElementById('task-title').focus();
-  } else {
-    addTaskForm.style.display = 'none';
-  }
-});
+// Form toggle logic removed as we use a separate window
 
 function renderTasks() {
   taskList.innerHTML = '';
@@ -269,28 +230,40 @@ function renderTasks() {
           else groups['No Date'].push(t); // Past or other
         }
       });
-    } else if (groupBy === 'title') {
-      sorted.forEach(t => {
-        const firstChar = t.title.charAt(0).toUpperCase();
-        const key = /^[A-Z]$/.test(firstChar) ? firstChar : '#';
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(t);
-      });
     } else if (groupBy === 'status') {
       groups = { 'Pending': [], 'Completed': [] };
       sorted.forEach(t => {
         if (t.done) groups['Completed'].push(t);
         else groups['Pending'].push(t);
       });
+    } else if (groupBy === 'category') {
+      groups = { 'No Group': [] };
+      // Ensure we use IDs as keys to avoid name collision issues, but display names in header
+      appData.categories.forEach(c => groups[c.id] = []);
+      sorted.forEach(t => {
+        if (t.categoryId && groups[t.categoryId]) {
+          groups[t.categoryId].push(t);
+        } else {
+          groups['No Group'].push(t);
+        }
+      });
     }
 
-    Object.keys(groups).forEach(groupName => {
-      if (groups[groupName].length > 0) {
+    Object.keys(groups).forEach(groupId => {
+      if (groups[groupId].length > 0) {
         const header = document.createElement('li');
         header.className = 'task-group-header';
-        header.innerText = groupName;
+        
+        let displayName = groupId;
+        if (groupId === 'No Group') displayName = 'No Group';
+        else {
+          const cat = appData.categories.find(c => c.id === groupId);
+          if (cat) displayName = cat.name;
+        }
+        
+        header.innerText = displayName;
         taskList.appendChild(header);
-        groups[groupName].forEach(task => renderTaskItem(task, taskList));
+        groups[groupId].forEach(task => renderTaskItem(task, taskList));
       }
     });
   }
@@ -305,7 +278,7 @@ function renderTaskItem(task, container) {
   let meta = '';
   if (task.customReminder) {
     const d = new Date(task.customReminder);
-    meta = `<div class="task-meta">Reminder: ${d.toLocaleString()}</div>`;
+    meta += `<span class="task-meta">⏰ ${d.toLocaleString()}</span>`;
   }
 
   li.innerHTML = `
@@ -345,39 +318,7 @@ function setupTaskItemEvents() {
       const id = e.target.dataset.edit;
       const t = appData.tasks.find(x => x.id === id);
       if (t) {
-        currentEditingTaskId = id;
-        addTaskForm.style.display = 'block';
-        document.getElementById('task-title').value = t.title;
-        document.getElementById('rem-days').value = '';
-        document.getElementById('rem-hours').value = '';
-        document.getElementById('rem-mins').value = '';
-        
-        if (t.reminderBefore) {
-          if (t.reminderBefore >= 1440 && t.reminderBefore % 1440 === 0) {
-             document.getElementById('rem-before-val').value = t.reminderBefore / 1440;
-             document.getElementById('rem-before-unit').value = 'days';
-          } else if (t.reminderBefore >= 60 && t.reminderBefore % 60 === 0) {
-             document.getElementById('rem-before-val').value = t.reminderBefore / 60;
-             document.getElementById('rem-before-unit').value = 'hours';
-          } else {
-             document.getElementById('rem-before-val').value = t.reminderBefore;
-             document.getElementById('rem-before-unit').value = 'mins';
-          }
-        } else {
-          document.getElementById('rem-before-val').value = '';
-          document.getElementById('rem-before-unit').value = 'mins';
-        }
-        
-        if (t.customReminder) {
-          const parts = t.customReminder.split('T');
-          document.getElementById('custom-date').value = parts[0];
-          document.getElementById('custom-time').value = parts[1];
-        } else {
-          document.getElementById('custom-date').value = '';
-          document.getElementById('custom-time').value = '';
-        }
-        document.getElementById('save-task').innerText = 'Save Task';
-        document.getElementById('task-title').focus();
+        window.api.openTaskWindow(id);
       }
     });
   });
