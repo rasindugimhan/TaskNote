@@ -40,11 +40,19 @@
     <div id="tasks-view" class="view active">
       <div class="view-header">
         <span style="font-weight: 500;">Tasks</span>
-        <select id="sort-tasks">
-          <option value="expire">Sort by Expiring Date</option>
-          <option value="time">Sort by Time Added</option>
-          <option value="alpha">Sort by A-Z</option>
-        </select>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; flex-grow: 1;">
+          <select id="group-tasks" style="font-size: 11px;">
+            <option value="none">Group: None</option>
+            <option value="date">Group: Date</option>
+            <option value="title">Group: Title</option>
+            <option value="status">Group: Status</option>
+          </select>
+          <select id="sort-tasks" style="font-size: 11px;">
+            <option value="expire">Sort: Expire</option>
+            <option value="time">Sort: Added</option>
+            <option value="alpha">Sort: A-Z</option>
+          </select>
+        </div>
       </div>
       <ul id="task-list" class="bullet-list"></ul>
     </div>
@@ -53,11 +61,13 @@
     <div id="notes-view" class="view">
       <div class="view-header">
         <span style="font-weight: 500;">All Notes</span>
-        <select id="sort-notes">
-          <option value="alpha">Sort by A-Z</option>
-          <option value="created">Sort by Date Created</option>
-          <option value="edited">Sort by Recently Edited</option>
-        </select>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; flex-grow: 1;">
+          <select id="sort-notes" style="font-size: 11px;">
+            <option value="alpha">Sort: A-Z</option>
+            <option value="created">Sort: Created</option>
+            <option value="edited">Sort: Edited</option>
+          </select>
+        </div>
       </div>
       <div id="notes-list" class="notes-list"></div>
     </div>

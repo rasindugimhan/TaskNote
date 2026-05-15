@@ -15,6 +15,7 @@ const views = document.querySelectorAll('.view');
 
 const taskList = document.getElementById('task-list');
 const sortTasksSelect = document.getElementById('sort-tasks');
+const groupTasksSelect = document.getElementById('group-tasks');
 const saveTaskBtn = document.getElementById('save-task');
 const addTaskBtn = document.getElementById('add-task-btn');
 const addTaskForm = document.getElementById('add-task-form');
@@ -201,6 +202,7 @@ saveTaskBtn.addEventListener('click', () => {
 });
 
 sortTasksSelect.addEventListener('change', renderTasks);
+groupTasksSelect.addEventListener('change', renderTasks);
 
 addTaskBtn.addEventListener('click', () => {
   if (addTaskForm.style.display === 'none') {
@@ -241,28 +243,84 @@ function renderTasks() {
     }
   });
 
-  sorted.forEach(task => {
-    const li = document.createElement('li');
-    if (task.done) li.className = 'done';
-    
-    let meta = '';
-    if (task.customReminder) {
-      const d = new Date(task.customReminder);
-      meta = `<div class="task-meta">Reminder: ${d.toLocaleString()}</div>`;
+  const groupBy = groupTasksSelect.value;
+  if (groupBy === 'none') {
+    sorted.forEach(task => renderTaskItem(task, taskList));
+  } else {
+    let groups = {};
+    if (groupBy === 'date') {
+      groups = { 'Today': [], 'Tomorrow': [], 'Upcoming': [], 'No Date': [] };
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dayAfterTomorrow = new Date(now);
+      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+      sorted.forEach(t => {
+        if (!t.customReminder) {
+          groups['No Date'].push(t);
+        } else {
+          const d = new Date(t.customReminder);
+          d.setHours(0,0,0,0);
+          if (d.getTime() === now.getTime()) groups['Today'].push(t);
+          else if (d.getTime() === tomorrow.getTime()) groups['Tomorrow'].push(t);
+          else if (d.getTime() >= dayAfterTomorrow.getTime()) groups['Upcoming'].push(t);
+          else groups['No Date'].push(t); // Past or other
+        }
+      });
+    } else if (groupBy === 'title') {
+      sorted.forEach(t => {
+        const firstChar = t.title.charAt(0).toUpperCase();
+        const key = /^[A-Z]$/.test(firstChar) ? firstChar : '#';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(t);
+      });
+    } else if (groupBy === 'status') {
+      groups = { 'Pending': [], 'Completed': [] };
+      sorted.forEach(t => {
+        if (t.done) groups['Completed'].push(t);
+        else groups['Pending'].push(t);
+      });
     }
 
-    li.innerHTML = `
-      <input type="checkbox" data-id="${task.id}" ${task.done ? 'checked' : ''}>
-      <div style="flex-grow:1;">
-        <div class="task-title">${task.title}</div>
-        ${meta}
-      </div>
-      <button class="btn-primary btn-sm" data-edit="${task.id}" style="padding:4px 8px; font-size:12px; margin-right:5px;">Edit</button>
-      <button class="btn-danger btn-sm" data-del="${task.id}" style="padding:4px 8px; font-size:12px;">Delete</button>
-    `;
-    taskList.appendChild(li);
-  });
+    Object.keys(groups).forEach(groupName => {
+      if (groups[groupName].length > 0) {
+        const header = document.createElement('li');
+        header.className = 'task-group-header';
+        header.innerText = groupName;
+        taskList.appendChild(header);
+        groups[groupName].forEach(task => renderTaskItem(task, taskList));
+      }
+    });
+  }
 
+  setupTaskItemEvents();
+}
+
+function renderTaskItem(task, container) {
+  const li = document.createElement('li');
+  if (task.done) li.className = 'done';
+  
+  let meta = '';
+  if (task.customReminder) {
+    const d = new Date(task.customReminder);
+    meta = `<div class="task-meta">Reminder: ${d.toLocaleString()}</div>`;
+  }
+
+  li.innerHTML = `
+    <input type="checkbox" data-id="${task.id}" ${task.done ? 'checked' : ''}>
+    <div style="flex-grow:1;">
+      <div class="task-title">${task.title}</div>
+      ${meta}
+    </div>
+    <button class="btn-primary btn-sm" data-edit="${task.id}" style="padding:4px 8px; font-size:12px; margin-right:5px;">Edit</button>
+    <button class="btn-danger btn-sm" data-del="${task.id}" style="padding:4px 8px; font-size:12px;">Delete</button>
+  `;
+  container.appendChild(li);
+}
+
+function setupTaskItemEvents() {
   taskList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', (e) => {
       const id = e.target.dataset.id;
