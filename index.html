@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasks & Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Title Bar -->
+  <div class="titlebar">
+    <button id="add-btn" title="Add New">+</button>
+    <div class="titlebar-drag-region"></div>
+    <div class="titlebar-controls">
+      <button id="menu-btn" title="Menu">...</button>
+      <button id="minimize-btn" title="Minimize">−</button>
+      <button id="close-btn" title="Close">×</button>
+    </div>
+  </div>
+
+  <!-- Dropdown Menu -->
+  <div id="dropdown-menu" class="hidden">
+    <button class="menu-item active" data-target="tasks-view">Tasks</button>
+    <button class="menu-item" data-target="notes-view">Notes</button>
+    <div class="divider"></div>
+    <button class="menu-item" id="open-dashboard-btn" style="color: #fce205;">Open Main App</button>
+    <button class="menu-item" id="pin-toggle">Pin to Top</button>
+  </div>
+
+  <div class="app-body">
+    <!-- Tasks View -->
+    <div id="tasks-view" class="view active">
+      <div class="view-header">
+        <span style="font-weight: 500;">Tasks</span>
+        <select id="sort-tasks">
+          <option value="expire">Sort by Expiring Date</option>
+          <option value="time">Sort by Time Added</option>
+          <option value="alpha">Sort by A-Z</option>
+        </select>
+      </div>
+      <ul id="task-list" class="bullet-list"></ul>
+    </div>
+
+    <!-- Notes List View -->
+    <div id="notes-view" class="view">
+      <div class="view-header">
+        <span style="font-weight: 500;">All Notes</span>
+        <select id="sort-notes">
+          <option value="alpha">Sort by A-Z</option>
+          <option value="created">Sort by Date Created</option>
+          <option value="edited">Sort by Recently Edited</option>
+        </select>
+      </div>
+      <div id="notes-list" class="notes-list"></div>
+    </div>
+
+    <!-- Single Note Editor View -->
+    <div id="note-editor" class="view" style="display: none;">
+      <div class="editor-toolbar">
+        <button id="back-to-notes">← Back</button>
+        <button id="del-note" style="color:#ef4444; margin-left:auto;">Delete</button>
+      </div>
+      <input type="text" id="note-editor-title" placeholder="Note Title...">
+      <textarea id="note-editor-body" placeholder="Write your note here..."></textarea>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="task-modal" class="modal hidden">
+    <div class="modal-content">
+      <input type="text" id="task-title" placeholder="Task Name..." autofocus>
+      
+      <label>Remind before expiry (Optional)</label>
+      <div class="row">
+        <input type="number" id="rem-before-days" min="0" placeholder="D" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">d</span>
+        <input type="number" id="rem-before-hours" min="0" placeholder="H" style="flex: 1;"> <span style="font-size: 12px; margin-right: 5px;">h</span>
+        <input type="number" id="rem-before-mins" min="0" placeholder="M" style="flex: 1;"> <span style="font-size: 12px;">m</span>
+      </div>
+
+      <div class="divider"></div>
+      <label>Precise Custom Reminder (Optional)</label>
+      <div class="row">
+        <input type="date" id="custom-date" style="flex: 2;">
+        <input type="time" id="custom-time" step="1" style="flex: 1;" title="Time including seconds">
+      </div>
+
+      <div class="row right" style="margin-top:10px;">
+        <button id="cancel-task" class="btn-outline">Cancel</button>
+        <button id="save-task" class="btn">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

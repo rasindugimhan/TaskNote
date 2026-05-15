@@ -1,0 +1,49 @@
+{
+  "name": "tasknoteapp",
+  "version": "1.0.0",
+  "description": "Task and Notes Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.rasin.tasknoteapp",
+    "productName": "TaskNote",
+    "win": {
+      "target": ["nsis", "portable", "dir"],
+      "icon": "notepad.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "dashboard.js",
+      "index.html",
+      "dashboard.html",
+      "style.css",
+      "dashboard.css",
+      "settings.html",
+      "settings.js",
+      "notepad.ico",
+      "notepad.png",
+      "notepad.webp",
+      "package.json"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^42.1.0",
+    "electron-builder": "^26.8.1",
+    "electron-winstaller": "^5.4.0"
+  },
+  "dependencies": {
+    "jimp": "^0.16.1"
+  }
+}

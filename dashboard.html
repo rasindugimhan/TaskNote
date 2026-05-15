@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskNote Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="brand">TaskNote</div>
+    <div class="nav-links">
+      <button class="nav-item active" data-target="tasks-view">Tasks</button>
+      <button class="nav-item" data-target="notes-view">Notes</button>
+      <button class="nav-item" data-target="settings-view">Settings</button>
+    </div>
+    <div style="flex-grow: 1;"></div>
+    <button id="open-widget-btn" class="action-btn">Open Sticky Widget</button>
+  </div>
+
+  <div class="main-content">
+    
+    <!-- Tasks View -->
+    <div id="tasks-view" class="view active">
+      <div class="header-row">
+        <h2>Tasks</h2>
+        <div>
+          <select id="sort-tasks">
+            <option value="expire">Sort by Expiring Date</option>
+            <option value="time">Sort by Time Added</option>
+            <option value="alpha">Sort by A-Z</option>
+          </select>
+          <button id="add-task-btn" class="btn-primary" style="margin-left:10px;">+ New Task</button>
+        </div>
+      </div>
+      
+      <div class="add-task-form" id="add-task-form" style="display: none;">
+        <input type="text" id="task-title" placeholder="What needs to be done?">
+        <div class="form-row" style="flex-wrap: wrap; gap: 10px; align-items: center;">
+          <span style="font-size: 13px;">Remind in:</span>
+          <input type="number" id="rem-days" min="0" placeholder="D" style="width: 50px;"> <span style="font-size: 12px;">d</span>
+          <input type="number" id="rem-hours" min="0" placeholder="H" style="width: 50px;"> <span style="font-size: 12px;">h</span>
+          <input type="number" id="rem-mins" min="0" placeholder="M" style="width: 50px;"> <span style="font-size: 12px;">m</span>
+          
+          <span style="margin-left:10px; font-size: 13px;">OR Precise:</span>
+          <input type="date" id="custom-date">
+          <input type="time" id="custom-time" step="1">
+        </div>
+        <div class="form-row" style="flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px;">
+          <span style="font-size: 13px; font-weight: bold;">Remind before expiry (Optional):</span>
+          <input type="number" id="rem-before-days" min="0" placeholder="D" style="width: 50px;"> <span style="font-size: 12px;">d</span>
+          <input type="number" id="rem-before-hours" min="0" placeholder="H" style="width: 50px;"> <span style="font-size: 12px;">h</span>
+          <input type="number" id="rem-before-mins" min="0" placeholder="M" style="width: 50px;"> <span style="font-size: 12px;">m</span>
+          <button id="save-task" class="btn-primary" style="margin-left: auto;">Add Task</button>
+        </div>
+      </div>
+
+      <ul id="task-list" class="task-list"></ul>
+    </div>
+
+    <!-- Notes View -->
+    <div id="notes-view" class="view">
+      <div class="header-row">
+        <h2>Notes</h2>
+        <div>
+          <select id="sort-notes">
+            <option value="alpha">Sort by A-Z</option>
+            <option value="created">Sort by Date Created</option>
+            <option value="edited">Sort by Recently Edited</option>
+          </select>
+          <button id="add-note-btn" class="btn-primary" style="margin-left:10px;">+ New Note</button>
+        </div>
+      </div>
+      
+      <div id="notes-grid" class="notes-grid"></div>
+    </div>
+
+    <!-- Note Editor View -->
+    <div id="note-editor" class="view" style="display: none;">
+      <div class="header-row">
+        <button id="back-to-notes" class="btn-secondary">← Back to Notes</button>
+        <button id="del-note" class="btn-danger">Delete Note</button>
+      </div>
+      <input type="text" id="note-editor-title" placeholder="Note Title...">
+      <textarea id="note-editor-body" placeholder="Write your note here..."></textarea>
+    </div>
+
+    <!-- Settings View -->
+    <div id="settings-view" class="view">
+      <div class="header-row">
+        <h2>Settings</h2>
+      </div>
+      
+      <div class="settings-card">
+        <div class="setting-row">
+          <span>Theme</span>
+          <select id="setting-theme">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <span>Auto Start on PC Boot</span>
+          <input type="checkbox" id="setting-autolaunch">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
