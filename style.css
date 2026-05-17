@@ -193,10 +193,23 @@ body {
   background: transparent; border: none; color: var(--text-color);
   font-size: 1.2rem; font-weight: bold; padding: 15px 20px 5px; outline: none;
 }
+.format-toolbar {
+  display: flex; gap: 8px; padding: 5px 20px; background: rgba(0,0,0,0.1); border-bottom: 1px solid var(--border-color); align-items: center; margin-bottom: 5px;
+}
+.format-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-color); cursor: pointer; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.format-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--border-color); }
+body.theme-light .format-btn:hover { background: rgba(0,0,0,0.05); }
+
 #note-editor-body {
   flex-grow: 1; background: transparent; border: none; color: var(--text-color);
-  font-family: inherit; font-size: 1rem; padding: 10px 20px; resize: none; outline: none;
+  font-family: inherit; font-size: 1rem; padding: 10px 20px; outline: none; overflow-y: auto;
 }
+#note-editor-body[contenteditable]:empty:before {
+  content: attr(placeholder); color: #888; pointer-events: none;
+}
+#note-editor-body img { max-width: 100%; border-radius: 4px; margin: 10px 0; }
 .editor-toolbar {
   padding: 5px 20px;
   display: flex;

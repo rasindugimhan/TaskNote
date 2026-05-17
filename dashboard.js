@@ -110,6 +110,7 @@ navItems.forEach(item => {
     
     views.forEach(v => {
       v.classList.remove('active');
+      v.style.display = '';
     });
     const target = document.getElementById(item.dataset.target);
     if (target) target.classList.add('active');
@@ -365,7 +366,7 @@ function openNoteEditor(id) {
   
   currentEditingNoteId = id;
   noteEditorTitle.value = note.title;
-  noteEditorBody.value = note.body;
+  noteEditorBody.innerHTML = note.body || '';
   
   views.forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });
   noteEditor.style.display = 'flex';
@@ -397,7 +398,7 @@ const saveNoteData = () => {
     const note = appData.notes.find(n => n.id === currentEditingNoteId);
     if(note) {
       note.title = noteEditorTitle.value || 'Untitled';
-      note.body = noteEditorBody.value;
+      note.body = noteEditorBody.innerHTML;
       note.updatedAt = Date.now();
       if(!note.createdAt) note.createdAt = Date.now();
       saveData();
@@ -406,6 +407,32 @@ const saveNoteData = () => {
 };
 noteEditorTitle.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
 noteEditorBody.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
+
+document.querySelectorAll('.format-btn[data-cmd]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.execCommand(btn.dataset.cmd, false, null);
+    noteEditorBody.focus();
+  });
+});
+
+const formatImageBtn = document.getElementById('format-image-btn');
+const formatImageInput = document.getElementById('format-image-input');
+if (formatImageBtn && formatImageInput) {
+  formatImageBtn.addEventListener('click', () => formatImageInput.click());
+  formatImageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        noteEditorBody.focus();
+        document.execCommand('insertImage', false, ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  });
+}
 
 // External Links
 document.addEventListener('click', (e) => {

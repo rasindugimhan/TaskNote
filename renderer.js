@@ -154,6 +154,8 @@ function setupEvents() {
       const now = Date.now();
       const newNote = { id: now.toString(), title: '', body: '', createdAt: now, updatedAt: now };
       appData.notes.unshift(newNote);
+      saveData();
+      renderNotes();
       openNoteEditor(newNote.id);
     } else {
       // Add Task
@@ -161,9 +163,9 @@ function setupEvents() {
       document.getElementById('task-title').value = '';
       document.getElementById('custom-date').value = '';
       document.getElementById('custom-time').value = '';
-      document.getElementById('rem-before-days').value = '';
-      document.getElementById('rem-before-hours').value = '';
-      document.getElementById('rem-before-mins').value = '';
+      document.getElementById('rem-days').value = '';
+      document.getElementById('rem-hours').value = '';
+      document.getElementById('rem-mins').value = '';
       document.getElementById('save-task').innerText = 'Add Task';
       taskModal.classList.remove('hidden');
       document.getElementById('task-title').focus();
@@ -263,7 +265,7 @@ function setupEvents() {
       const note = appData.notes.find(n => n.id === currentEditingNoteId);
       if(note) {
         note.title = noteEditorTitle.value || 'Untitled';
-        note.body = noteEditorBody.value;
+        note.body = noteEditorBody.innerHTML;
         note.updatedAt = Date.now();
         if(!note.createdAt) note.createdAt = Date.now();
         saveData();
@@ -272,6 +274,32 @@ function setupEvents() {
   };
   noteEditorTitle.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
   noteEditorBody.addEventListener('input', () => { clearTimeout(noteTimeout); noteTimeout = setTimeout(saveNoteData, 500); });
+
+  document.querySelectorAll('.format-btn[data-cmd]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.execCommand(btn.dataset.cmd, false, null);
+      noteEditorBody.focus();
+    });
+  });
+
+  const formatImageBtn = document.getElementById('format-image-btn');
+  const formatImageInput = document.getElementById('format-image-input');
+  if (formatImageBtn && formatImageInput) {
+    formatImageBtn.addEventListener('click', () => formatImageInput.click());
+    formatImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          noteEditorBody.focus();
+          document.execCommand('insertImage', false, ev.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+      e.target.value = '';
+    });
+  }
 
   if (quickAddCatBtn) {
     quickAddCatBtn.addEventListener('click', (e) => {
@@ -487,7 +515,7 @@ function openNoteEditor(id) {
   
   currentEditingNoteId = id;
   noteEditorTitle.value = note.title;
-  noteEditorBody.value = note.body;
+  noteEditorBody.innerHTML = note.body || '';
   
   // Hide other views, show editor
   views.forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });

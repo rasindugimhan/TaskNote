@@ -173,7 +173,22 @@ body.theme-light .task-group-header {
 #note-editor { flex-direction: column; height: 100%; }
 #note-editor.active { display: flex; }
 #note-editor-title { background: transparent; border: none; color: var(--text-color); font-size: 24px; font-weight: bold; margin-bottom: 15px; outline: none; }
-#note-editor-body { flex-grow: 1; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 20px; border-radius: 8px; font-family: inherit; font-size: 16px; resize: none; outline: none; }
+.format-toolbar {
+  display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; align-items: center;
+}
+.format-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-color); cursor: pointer; padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.format-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--border-color); }
+body.theme-light .format-btn:hover { background: rgba(0,0,0,0.05); }
+
+#note-editor-body {
+  flex-grow: 1; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 20px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: inherit; font-size: 16px; outline: none; overflow-y: auto;
+}
+#note-editor-body[contenteditable]:empty:before {
+  content: attr(placeholder); color: var(--text-muted); pointer-events: none;
+}
+#note-editor-body img { max-width: 100%; border-radius: 4px; margin: 15px 0; }
 
 /* Settings */
 .settings-card { background: var(--panel-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 600px; }
